@@ -16,26 +16,23 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+// import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
+// import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC721ReceiverUpgradeable.sol";
 
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+// import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-// import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-// import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 
@@ -45,7 +42,8 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URISto
 
 
 
-contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableUpgradeable, ERC721URIStorageUpgradeable, ERC721HolderUpgradeable, OwnableUpgradeable, AccessControlUpgradeable , ReentrancyGuardUpgradeable{
+contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableUpgradeable, ERC721URIStorageUpgradeable, ERC721HolderUpgradeable, OwnableUpgradeable,  ReentrancyGuardUpgradeable{
+    
     using Counters for Counters.Counter;
     using SafeMath for uint256;
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -105,8 +103,8 @@ contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableU
         uint256 adminFee1;  // default 0.85%
         uint256 adminFee2;  // default 0.15%
     }
-    Info public info;
 
+    Info public info;
    
     // events 
     event ItemCreated(uint256 itemId);
@@ -121,7 +119,7 @@ contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableU
 
         __Ownable_init();
 
-        __AccessControl_init();
+        // __AccessControl_init();
 
         __ERC721_init("Price NFT" , "Price NFT");
 
@@ -145,7 +143,7 @@ contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableU
     function _authorizeUpgrade(address) internal override onlyOwner {}
 
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721Upgradeable, ERC721EnumerableUpgradeable,AccessControlUpgradeable) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721Upgradeable, ERC721EnumerableUpgradeable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
