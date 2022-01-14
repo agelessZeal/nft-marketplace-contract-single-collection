@@ -2,37 +2,20 @@
 pragma solidity ^0.8.4;
 pragma experimental ABIEncoderV2;
 
-// import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-// import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-// import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-// import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-// import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-// import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-// import "@openzeppelin/contracts/access/Ownable.sol";
-// import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-// import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
-// import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-
-// import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
-
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC721ReceiverUpgradeable.sol";
 
-// import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol";
 
@@ -127,7 +110,7 @@ contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableU
         info.adminFee1 = 85;
         info.adminFee2 = 15;
 
-        // addSupportedToken(address(0x0));  // ETH
+        addSupportedToken(address(0x0));  // ETH
         addSupportedToken(_token); // Token
 
         info.feeAddress1 = _fee1;
