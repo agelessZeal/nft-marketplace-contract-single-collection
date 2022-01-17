@@ -85,6 +85,9 @@ contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableU
         uint256 royalty;   // default 1%
         uint256 adminFee1;  // default 0.85%
         uint256 adminFee2;  // default 0.15%
+
+        uint256 mintFee;  // default 2.5%
+        address mintFeeAddress;
     }
 
     Info public info;
@@ -98,7 +101,7 @@ contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableU
     event ItemSold(address buyer , uint256 tokenID, uint256 itemId, uint256 amount);
     event UpdatedSupportCurrency(address currency , bool acceptable);
 
-    function initialize(address _token, address _fee1, address _fee2) public  initializer {
+    function initialize(address _token, address _fee1, address _fee2 , address _mintFeeAddress) public  initializer {
 
         __Ownable_init();
 
@@ -109,12 +112,14 @@ contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableU
         info.royalty = 100;
         info.adminFee1 = 85;
         info.adminFee2 = 15;
+        info.mintFee = 250;
 
         addSupportedToken(address(0x0));  // ETH
         addSupportedToken(_token); // Token
 
         info.feeAddress1 = _fee1;
         info.feeAddress2 = _fee2;
+        info.mintFeeAddress = _mintFeeAddress;
         info.tokenAddress = _token;
         info.minTokenToCreate = 0;
 
@@ -152,11 +157,21 @@ contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableU
         uint256 _endTime,
         address _currency,
         uint256 _requiredToken
-    ) external returns (uint256) {
+    ) external payable nonReentrant returns (uint256) {
         require(!_auctionable || _count == 1, "can mint only 1 for auctionable item");
         require(_price > 0, "invalid price");
         require(isSupportedToken(_currency), "invalid payment currency");
         require(info.minTokenToCreate <= IERC20(info.tokenAddress).balanceOf(_msgSender()), "insufficient $Token Balance");
+
+        uint256 _mintFeeValue= _price.mul(info.mintFee).div(PERCENTS_DIVIDER);
+
+        require(_currency != address(0x0) || _mintFeeValue == msg.value, "invalid eth value");
+            
+        if (_currency == address(0)) {
+              _safeTransferETH(info.mintFeeAddress, _mintFeeValue);
+        } else {
+             IERC20(_currency).transferFrom(_msgSender(),info.mintFeeAddress, _mintFeeValue);
+        }
 
         
         _itemIds.increment();
@@ -195,11 +210,21 @@ contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableU
         uint256 _endTime,
         address _currency,
         uint256 _requiredToken
-    ) external returns (uint256) {
+    ) external payable nonReentrant  returns (uint256) {
         require(_price > 0, "invalid price");
         require(isSupportedToken(_currency), "invalid payment currency");
         require(ERC721Upgradeable(_collection).ownerOf(_tokenId) == _msgSender(), "not owner");
         require(info.minTokenToCreate <= IERC20(info.tokenAddress).balanceOf(_msgSender()), "insufficient $Token Balance");
+
+        uint256 _mintFeeValue= _price.mul(info.mintFee).div(PERCENTS_DIVIDER);
+
+        require(_currency != address(0x0) || _mintFeeValue == msg.value, "invalid eth value");
+            
+        if (_currency == address(0)) {
+              _safeTransferETH(info.mintFeeAddress, _mintFeeValue);
+        } else {
+             IERC20(_currency).transferFrom(_msgSender(),info.mintFeeAddress, _mintFeeValue);
+        }
 
 
         _itemIds.increment();
@@ -416,6 +441,7 @@ contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableU
             || item.condition.requiredToken <= IERC20(info.tokenAddress).balanceOf(_msgSender()), "insufficient $Token Balance");
     }
 
+
     function _processPayment(uint256 _id, address buyer, uint256 _amount) internal {
         Item memory item = items[_id];
         
@@ -503,7 +529,6 @@ contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableU
     }
     
     receive() external payable {}
-
     /**
         For Admin
      */
@@ -529,9 +554,10 @@ contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableU
         return _supportedTokens.length();
     }
 
-    function setFeeAddress(address _address1, address _address2) external onlyOwner {
+    function setFeeAddress(address _address1, address _address2,address _address3) external onlyOwner {
 		info.feeAddress1 = _address1;
 		info.feeAddress2 = _address2;
+        info.mintFeeAddress = _address3;
     }
 
 	function setFeePercent(uint256 _adminPercent1, uint256 _adminPercent2, uint256 _royalty) external onlyOwner {
@@ -541,6 +567,11 @@ contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableU
 		info.adminFee1 = _adminPercent1;
 		info.adminFee2 = _adminPercent2;
         info.royalty = _royalty;
+	}
+
+    function setMintFeePercent(uint256 _mintFee) external onlyOwner {
+		require(_mintFee < FEE_MAX_PERCENT, "too big fee percent");
+		info.mintFee = _mintFee;
 	}
 
 
@@ -572,6 +603,5 @@ contract NFTMarketplace is UUPSUpgradeable, ERC721Upgradeable, ERC721EnumerableU
         require(items[_id].creator == _msgSender() || owner() == _msgSender(), "only for item creator");
         _;
     }
-
 }
 
